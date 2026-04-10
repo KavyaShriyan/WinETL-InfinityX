@@ -1,0 +1,34 @@
+{
+  "connectors": {
+    "default": "default"
+  },
+  "rules": [
+    {
+      "name": "source_count_check",
+      "rule_type": "count_validation",
+      "params": {
+        "table1": "dbo.emp_source2",
+        "table2": "dbo.emp_target2",
+        "connector": "default"
+      }
+    },
+    {
+      "name": "null_check_source",
+      "rule_type": "null_check",
+      "params": {
+        "table": "dbo.emp_source2",
+        "connector": "default"
+      }
+    },
+    {
+      "name": "freshness_check",
+      "rule_type": "data_freshness",
+      "params": {
+        "table": "dbo.emp_source2",
+        "timestamp_column": "LastModified",
+        "sla_hours": 24,
+        "connector": "default"
+      }
+    }
+  ]
+}

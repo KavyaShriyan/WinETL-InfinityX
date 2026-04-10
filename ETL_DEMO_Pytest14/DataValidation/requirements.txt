@@ -1,0 +1,14 @@
+pyodbc
+pymysql
+psycopg2
+cx-Oracle
+pymongo
+cassandra-driver
+boto3
+azure-storage-blob
+google-cloud-storage
+requests
+pandas
+pytest
+python-dotenv
+databricks-sql-connector

@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - WinETL InfinityX</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .signup-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-width: 900px;
+            width: 100%;
+            padding: 60px 50px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-group label .required {
+            color: #e74c3c;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control.success {
+            border-color: #2ecc71;
+        }
+
+        .form-control.error {
+            border-color: #e74c3c;
+        }
+
+        .otp-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .otp-group .form-control {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #e0e0e0;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-full {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .alert-success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #bbdefb;
+        }
+
+        .help-text {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .password-strength {
+            margin-top: 8px;
+            font-size: 0.85em;
+        }
+
+        .strength-meter {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .strength-meter-fill {
+            height: 100%;
+            transition: all 0.3s;
+            border-radius: 2px;
+        }
+
+        .strength-weak {
+            width: 33%;
+            background: #e74c3c;
+        }
+
+        .strength-medium {
+            width: 66%;
+            background: #f39c12;
+        }
+
+        .strength-strong {
+            width: 100%;
+            background: #2ecc71;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .loading-spinner {
+            display: none;
+            margin-left: 10px;
+        }
+
+        .loading-spinner.active {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fa-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        .verification-badge {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #2ecc71;
+            display: none;
+        }
+
+        .verification-badge.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .signup-container {
+                padding: 40px 30px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="header">
+            <h1><i class="fas fa-user-plus"></i> Create Account</h1>
+            <p>Join WinETL InfinityX - Enterprise ETL Validation Platform</p>
+        </div>
+
+        <div class="alert alert-error" id="errorAlert"></div>
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-info" id="infoAlert"></div>
+
+        <form id="signupForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="username">
+                        User Name <span class="required">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" class="form-control" 
+                               placeholder="Enter your full name" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="userId">
+                        User ID <span class="required">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="userId" class="form-control" 
+                               placeholder="Choose a unique user ID" required>
+                    </div>
+                    <div class="help-text">Alphanumeric, no spaces</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">
+                    Email Address <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" class="form-control" 
+                           placeholder="Enter your email address" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">
+                    Password <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" class="form-control" 
+                           placeholder="Create a strong password" required>
+                </div>
+                <div class="password-strength" id="passwordStrength">
+                    <div class="strength-meter">
+                        <div class="strength-meter-fill" id="strengthFill"></div>
+                    </div>
+                    <span id="strengthText"></span>
+                </div>
+                <div class="help-text">
+                    Minimum 8 characters, must include uppercase, lowercase, number, and special character
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="mobileNumber">
+                    Mobile Number (Optional)
+                </label>
+                <div class="input-wrapper">
+                    <i class="fas fa-mobile-alt"></i>
+                    <input type="tel" id="mobileNumber" class="form-control" 
+                           placeholder="+1234567890 (optional)">
+                </div>
+                <div class="help-text">OTP verification temporarily disabled for demo purposes</div>
+            </div>
+
+            <!-- OTP section hidden for now -->
+            <div class="form-group" id="otpGroup" style="display: none;">
+                <label for="otp">
+                    Enter OTP
+                </label>
+                <div class="otp-group">
+                    <div class="input-wrapper" style="flex: 1;">
+                        <i class="fas fa-key"></i>
+                        <input type="text" id="otp" class="form-control" 
+                               placeholder="Enter 6-digit OTP" maxlength="6" pattern="[0-9]{6}">
+                    </div>
+                    <button type="button" class="btn btn-secondary" id="verifyOtpBtn">
+                        <i class="fas fa-check"></i> Verify
+                        <i class="fas fa-spinner loading-spinner" id="verifySpinner"></i>
+                    </button>
+                </div>
+                <div class="help-text" id="otpTimer"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full" id="signupBtn">
+                <i class="fas fa-user-check"></i> Create Account
+                <i class="fas fa-spinner loading-spinner" id="signupSpinner"></i>
+            </button>
+        </form>
+
+        <div class="login-link">
+            Already have an account? 
+            <a href="login.html">Sign In</a>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        let otpSent = false;
+        let otpVerified = false;
+        let otpExpiry = null;
+
+        // Password strength checker
+        document.getElementById('password').addEventListener('input', (e) => {
+            const password = e.target.value;
+            const strengthFill = document.getElementById('strengthFill');
+            const strengthText = document.getElementById('strengthText');
+
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+
+            strengthFill.className = 'strength-meter-fill';
+            if (strength <= 2) {
+                strengthFill.classList.add('strength-weak');
+                strengthText.textContent = 'Weak password';
+                strengthText.style.color = '#e74c3c';
+            } else if (strength <= 4) {
+                strengthFill.classList.add('strength-medium');
+                strengthText.textContent = 'Medium strength';
+                strengthText.style.color = '#f39c12';
+            } else {
+                strengthFill.classList.add('strength-strong');
+                strengthText.textContent = 'Strong password';
+                strengthText.style.color = '#2ecc71';
+            }
+        });
+
+        // OTP functionality disabled - commenting out event listeners
+        /*
+        // Send OTP
+        document.getElementById('sendOtpBtn').addEventListener('click', async () => {
+            const mobileNumber = document.getElementById('mobileNumber').value.trim();
+            const sendOtpBtn = document.getElementById('sendOtpBtn');
+
+            if (!mobileNumber) {
+                showError('Please enter your mobile number');
+                return;
+            }
+
+            if (!/^\+?[1-9]\d{9,14}$/.test(mobileNumber)) {
+                showError('Invalid mobile number format. Include country code (e.g., +1234567890)');
+                return;
+            }
+
+            sendOtpBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/request-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mobile_number: mobileNumber })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    otpSent = true;
+                    otpExpiry = Date.now() + (5 * 60 * 1000); // 5 minutes
+                    document.getElementById('otpGroup').style.display = 'block';
+                    showInfo(`OTP sent! ${data.note || ''} OTP: ${data.otp || 'Check your phone'}`);
+                    startOtpTimer();
+                    sendOtpBtn.textContent = 'Resend OTP';
+                    setTimeout(() => { sendOtpBtn.disabled = false; }, 60000); // Re-enable after 1 min
+                } else {
+                    showError(data.message || 'Failed to send OTP');
+                    sendOtpBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('OTP error:', error);
+                showError('Connection error. Please try again.');
+                sendOtpBtn.disabled = false;
+            }
+        });
+        */
+
+        /*
+        // Verify OTP - Disabled
+        document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
+            const mobileNumber = document.getElementById('mobileNumber').value.trim();
+            const otp = document.getElementById('otp').value.trim();
+            const verifyBtn = document.getElementById('verifyOtpBtn');
+            const spinner = document.getElementById('verifySpinner');
+
+            if (!otp || otp.length !== 6) {
+                showError('Please enter the 6-digit OTP');
+                return;
+            }
+
+            verifyBtn.disabled = true;
+            spinner.classList.add('active');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/verify-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mobile_number: mobileNumber,
+                        otp: otp
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    otpVerified = true;
+                    document.getElementById('mobileVerified').classList.add('active');
+                    document.getElementById('mobileNumber').classList.add('success');
+                    document.getElementById('otp').classList.add('success');
+                    document.getElementById('signupBtn').disabled = false;
+                    showSuccess('Mobile number verified successfully!');
+                    verifyBtn.disabled = true;
+                    document.getElementById('sendOtpBtn').disabled = true;
+                } else {
+                    showError(data.message || 'OTP verification failed');
+                    verifyBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Verification error:', error);
+                showError('Connection error. Please try again.');
+                verifyBtn.disabled = false;
+            } finally {
+                spinner.classList.remove('active');
+            }
+        });
+        */
+
+        // Sign up form submission
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // OTP verification disabled for demo purposes
+            // if (!otpVerified) {
+            //     showError('Please verify your mobile number first');
+            //     return;
+            // }
+
+            const formData = {
+                username: document.getElementById('username').value.trim(),
+                user_id: document.getElementById('userId').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                password: document.getElementById('password').value,
+                mobile_number: document.getElementById('mobileNumber').value.trim() || '',
+                otp: ''  // OTP verification bypassed
+            };
+
+            const signupBtn = document.getElementById('signupBtn');
+            const spinner = document.getElementById('signupSpinner');
+
+            signupBtn.disabled = true;
+            spinner.classList.add('active');
+
+            console.log('Submitting signup with data:', { ...formData, password: '***' });
+
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (data.success) {
+                    showSuccess('Account created successfully! Redirecting to login...');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    showError(data.message || 'Signup failed');
+                    signupBtn.disabled = false;
+                    spinner.classList.remove('active');
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                showError('Connection error: ' + error.message);
+                signupBtn.disabled = false;
+                spinner.classList.remove('active');
+            }
+        });
+
+        function startOtpTimer() {
+            const timerElement = document.getElementById('otpTimer');
+            
+            const updateTimer = () => {
+                if (!otpExpiry) return;
+                
+                const remaining = Math.max(0, Math.floor((otpExpiry - Date.now()) / 1000));
+                const minutes = Math.floor(remaining / 60);
+                const seconds = remaining % 60;
+                
+                timerElement.textContent = `OTP expires in: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (remaining > 0) {
+                    setTimeout(updateTimer, 1000);
+                } else {
+                    timerElement.textContent = 'OTP expired. Please request a new OTP.';
+                    timerElement.style.color = '#e74c3c';
+                }
+            };
+            
+            updateTimer();
+        }
+
+        function showError(message) {
+            const errorAlert = document.getElementById('errorAlert');
+            errorAlert.textContent = message;
+            errorAlert.style.display = 'block';
+            document.getElementById('successAlert').style.display = 'none';
+            document.getElementById('infoAlert').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const successAlert = document.getElementById('successAlert');
+            successAlert.textContent = message;
+            successAlert.style.display = 'block';
+            document.getElementById('errorAlert').style.display = 'none';
+            document.getElementById('infoAlert').style.display = 'none';
+        }
+
+        function showInfo(message) {
+            const infoAlert = document.getElementById('infoAlert');
+            infoAlert.textContent = message;
+            infoAlert.style.display = 'block';
+            document.getElementById('errorAlert').style.display = 'none';
+            document.getElementById('successAlert').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

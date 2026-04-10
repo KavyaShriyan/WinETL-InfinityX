@@ -1,0 +1,90 @@
+ETL Validation Execution - 20260128_125300
+Source: Flat File (emp_source.csv)
+Target Table: dbo.emp_merged_target
+Timestamp: 2026-01-28T12:53:01.017077
+
+Structure Validation:
+
+📐 Structure Validation:
+
+🗂 Table Name: temp_source_20260128_125300
+🔢 Number of columns: 10
+📋 Column Names: employee_id, first_name, last_name, email, phone_number, hire_date, job_id, salary, manager_id, department_id
+🧾 Column Details:
+  - employee_id (bigint, NULLABLE)
+  - first_name (nvarchar, NULLABLE)
+  - last_name (nvarchar, NULLABLE)
+  - email (nvarchar, NULLABLE)
+  - phone_number (nvarchar, NULLABLE)
+  - hire_date (nvarchar, NULLABLE)
+  - job_id (bigint, NULLABLE)
+  - salary (bigint, NULLABLE)
+  - manager_id (float, NULLABLE)
+  - department_id (bigint, NULLABLE)
+🔑 Primary Keys: None
+
+🗂 Table Name: dbo.emp_merged_target
+🔢 Number of columns: 10
+📋 Column Names: Emp_id, FirstName, LastName, Email, PhoneNumber, Hired_Date, Job_Id, Salary, Manager_id, Department_id
+🧾 Column Details:
+  - Emp_id (int, NULLABLE)
+  - FirstName (varchar, NULLABLE)
+  - LastName (varchar, NULLABLE)
+  - Email (varchar, NULLABLE)
+  - PhoneNumber (varchar, NULLABLE)
+  - Hired_Date (date, NULLABLE)
+  - Job_Id (int, NULLABLE)
+  - Salary (decimal, NULLABLE)
+  - Manager_id (int, NULLABLE)
+  - Department_id (int, NULLABLE)
+🔑 Primary Keys: None
+
+❌ Source and Target Table Structure and DataTypes are mismatched.
+
+Record Count Validation:
+🔢 Record Count Check:
+ - Source (temp_source_20260128_125300): 40 rows
+ - Target (dbo.emp_merged_target): 83 rows
+❌ Source and Target Record counts are mismatched.
+
+Null Check:
+SOURCE TABLE (Flat File):
+
+🚫 NULL Validation Report for: temp_source_20260128_125300
+ - employee_id: 0 NULLs
+ - first_name: 0 NULLs
+ - last_name: 0 NULLs
+ - email: 0 NULLs
+ - phone_number: 6 NULLs
+ - hire_date: 0 NULLs
+ - job_id: 0 NULLs
+ - salary: 0 NULLs
+ - manager_id: 1 NULLs
+ - department_id: 0 NULLs
+✅ Nullable, Not Null and Primary Key Constraints are verified.
+
+TARGET TABLE:
+
+🚫 NULL Validation Report for: dbo.emp_merged_target
+ - Emp_id: 0 NULLs
+ - FirstName: 1 NULLs
+ - LastName: 0 NULLs
+ - Email: 1 NULLs
+ - PhoneNumber: 0 NULLs
+ - Hired_Date: 0 NULLs
+ - Job_Id: 0 NULLs
+ - Salary: 0 NULLs
+ - Manager_id: 9 NULLs
+ - Department_id: 0 NULLs
+✅ Nullable, Not Null and Primary Key Constraints are verified.
+
+Duplicate Check:
+SOURCE TABLE (Flat File):
+⚠️ No primary key found for table temp_source_20260128_125300. Cannot perform duplicate check.
+
+TARGET TABLE:
+⚠️ No primary key found for table dbo.emp_merged_target. Cannot perform duplicate check.
+
+Row-wise Data Validation:
+❌ Column mismatch between tables. Cannot compare row-level data accurately.
+

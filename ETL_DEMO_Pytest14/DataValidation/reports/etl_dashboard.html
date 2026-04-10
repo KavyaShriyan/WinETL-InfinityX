@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETL Validation Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; color: #333; }
+        
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; text-align: center; }
+        .header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .header .subtitle { opacity: 0.9; font-size: 0.95rem; }
+        .header .tables { margin-top: 1rem; font-size: 0.9rem; background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 5px; display: inline-block; }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .summary-card { background: white; border-radius: 10px; padding: 1.5rem; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .summary-card h3 { font-size: 0.85rem; color: #666; margin-bottom: 0.5rem; text-transform: uppercase; }
+        .summary-card .value { font-size: 2.5rem; font-weight: 700; }
+        .summary-card.source .value { color: #3498db; }
+        .summary-card.target .value { color: #9b59b6; }
+        .summary-card.pass .value { color: #27ae60; }
+        .summary-card.fail .value { color: #e74c3c; }
+        .summary-card.mismatch .value { color: #f39c12; }
+        
+        .section { background: white; border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .section h2 { font-size: 1.25rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #eee; color: #444; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th { background: #667eea; color: white; padding: 12px; text-align: left; font-weight: 600; }
+        td { padding: 10px 12px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f8f9fa; }
+        
+        .status-pass { background: #d4edda; color: #155724; font-weight: 600; padding: 4px 12px; border-radius: 4px; }
+        .status-fail { background: #f8d7da; color: #721c24; font-weight: 600; padding: 4px 12px; border-radius: 4px; }
+        .status-info { background: #fff3cd; color: #856404; font-weight: 600; padding: 4px 12px; border-radius: 4px; }
+        
+        .detail-card { border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+        .detail-card.pass { background: #f0fff4; border-left: 4px solid #27ae60; }
+        .detail-card.fail { background: #fff5f5; border-left: 4px solid #e74c3c; }
+        .detail-card.info { background: #fffbeb; border-left: 4px solid #f39c12; }
+        .detail-card h4 { margin-bottom: 0.5rem; color: #333; }
+        .result-content { padding: 1rem; background: #f8f9fa; border-radius: 4px; word-wrap: break-word; overflow-wrap: break-word; }
+        .result-content pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }
+
+        .count-display { text-align: center; font-size: 1.1rem; }
+        .count-label { font-weight: 600; color: #555; }
+        .count-value { font-size: 1.2rem; font-weight: 700; color: #27ae60; }
+
+        .data-validation-display { display: flex; justify-content: space-around; flex-wrap: wrap; }
+        .validation-stat { text-align: center; margin: 0.5rem; }
+        .stat-label { display: block; font-weight: 600; color: #555; margin-bottom: 0.25rem; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; }
+
+        .structure-display, .null-display, .duplicate-display { text-align: center; font-size: 1.1rem; font-weight: 600; }
+        .success-icon { color: #27ae60; margin-right: 0.5rem; }
+        .error-icon { color: #e74c3c; margin-right: 0.5rem; }
+        
+        .data-table { font-size: 0.85rem; }
+        .data-table th { background: #34495e; font-size: 0.8rem; }
+        .data-table td { font-size: 0.8rem; }
+        
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .tab-btn { padding: 0.75rem 1.5rem; border: none; background: #e9ecef; border-radius: 5px; cursor: pointer; font-weight: 500; }
+        .tab-btn.active { background: #667eea; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .no-data { text-align: center; padding: 2rem; color: #666; font-style: italic; }
+        
+        .footer { text-align: center; padding: 1rem; color: #666; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ETL Validation Dashboard</h1>
+        <div class="subtitle">Generated on 2026-01-28 12:50:18</div>
+        <div class="tables">
+            <strong>Source:</strong> dbo.emp_merged &nbsp;|&nbsp; <strong>Target:</strong> dbo.emp_merged_target
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card source">
+                <h3>Source Records</h3>
+                <div class="value">83</div>
+            </div>
+            <div class="summary-card target">
+                <h3>Target Records</h3>
+                <div class="value">83</div>
+            </div>
+            <div class="summary-card pass">
+                <h3>Validations Passed</h3>
+                <div class="value">7</div>
+            </div>
+            <div class="summary-card fail">
+                <h3>Validations Failed</h3>
+                <div class="value">0</div>
+            </div>
+            <div class="summary-card mismatch">
+                <h3>Mismatched Records</h3>
+                <div class="value">4</div>
+            </div>
+        </div>
+        
+        <!-- Validation Summary -->
+        <div class="section">
+            <h2>Validation Summary</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Validation Check</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+            <tr>
+                <td>Structure Validation</td>
+                <td class="status-pass">PASS</td>
+                <td>Columns: 10</td>
+            </tr>
+        
+            <tr>
+                <td>Record Count Check</td>
+                <td class="status-pass">PASS</td>
+                <td>Source: 83, Target: 83</td>
+            </tr>
+        
+            <tr>
+                <td>Null Check (Source)</td>
+                <td class="status-pass">PASS</td>
+                <td>NULL values checked</td>
+            </tr>
+        
+            <tr>
+                <td>Null Check (Target)</td>
+                <td class="status-pass">PASS</td>
+                <td>NULL values checked</td>
+            </tr>
+        
+            <tr>
+                <td>Duplicate Check (Source)</td>
+                <td class="status-pass">PASS</td>
+                <td>Checked</td>
+            </tr>
+        
+            <tr>
+                <td>Duplicate Check (Target)</td>
+                <td class="status-pass">PASS</td>
+                <td>Checked</td>
+            </tr>
+        
+            <tr>
+                <td>Row-wise Data Validation</td>
+                <td class="status-pass">PASS</td>
+                <td>Matched: 47, Mismatched: 4</td>
+            </tr>
+        
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Mismatch Records -->
+        <div class="section">
+            <h2>Mismatch Records</h2>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('source-mismatch')">Only in Source (2)</button>
+                <button class="tab-btn" onclick="showTab('target-mismatch')">Only in Target (2)</button>
+            </div>
+            <div id="source-mismatch" class="tab-content active">
+                <table class="data-table"><thead><tr><th>Emp_id</th><th>FirstName</th><th>LastName</th><th>Email</th><th>PhoneNumber</th><th>Hired_Date</th><th>Job_Id</th><th>Salary</th><th>Manager_id</th><th>Department_id</th></tr></thead><tbody><tr><td>102</td><td>Lex</td><td>De Haan</td><td>lex.de haan@sqltutorial.org</td><td>515.123.4569</td><td>1993-01-13</td><td>5</td><td>17000.0</td><td>100</td><td>9</td></tr><tr><td>112</td><td>Jose Manuel</td><td>Urman</td><td>jose manuel.urman@sqltutorial.org</td><td>515.124.4469</td><td>1998-03-07</td><td>6</td><td>7800.0</td><td>108</td><td>10</td></tr></tbody></table>
+            </div>
+            <div id="target-mismatch" class="tab-content">
+                <table class="data-table"><thead><tr><th>Emp_id</th><th>FirstName</th><th>LastName</th><th>Email</th><th>PhoneNumber</th><th>Hired_Date</th><th>Job_Id</th><th>Salary</th><th>Manager_id</th><th>Department_id</th></tr></thead><tbody><tr><td>102</td><td>Lex</td><td>De haan</td><td>lex.de haan@sqltutorial.org</td><td>515.123.4569</td><td>1993-01-13</td><td>5</td><td>17000.0</td><td>100</td><td>9</td></tr><tr><td>112</td><td>Jose manuel</td><td>Urman</td><td>jose manuel.urman@sqltutorial.org</td><td>515.124.4469</td><td>1998-03-07</td><td>6</td><td>7800.0</td><td>108</td><td>10</td></tr></tbody></table>
+            </div>
+        </div>
+        
+        <!-- Duplicate Records -->
+        <div class="section">
+            <h2>Duplicate Records (0 found)</h2>
+            <div class="no-data">No duplicate records found.</div>
+        </div>
+        
+        <!-- Detailed Validation Results -->
+        <div class="section">
+            <h2>Detailed Validation Results</h2>
+            
+        <div class="detail-card pass">
+            <h4>Structure Validation</h4>
+            <pre>
+📐 Structure Validation:
+
+🗂 Table Name: dbo.emp_merged
+🔢 Number of columns: 10
+📋 Column Names: Emp_id, FirstName, LastName, Email, PhoneNumber, Hired_Date, Job_Id, Salary, Manager_id, Department_id
+🧾 Column Details:
+  - Emp_id (int, NULLABLE)
+  - FirstName (varchar, NULLABLE)
+  - LastName (varchar, NULLABLE)
+  - Email (varchar, NULLABLE)
+  - PhoneNumber (varchar, NULLABLE)
+  - Hired_Date (date, NULLABLE)
+  - Job_Id (int, NULLABLE)
+  - Salary (decimal, NULLABLE)
+  - Manager_id (int, NULLABLE)
+  - Department_id (int, NULLABLE)
+🔑 Primary Keys: None
+
+🗂 Table Name: dbo.emp_merged_target
+🔢 Number of columns: 10
+📋 Column Names: Emp_id, FirstName, LastName, Email, PhoneNumber, Hired_Date, Job_Id, Salary, Manager_id, Department_id
+🧾 Column Details:
+  - Emp_id (int, NULLABLE)
+  - FirstName (varchar, NULLABLE)
+  - LastName (varchar, NULLABLE)
+  - Email (varchar, NULLABLE)
+  - PhoneNumber (varchar, NULLABLE)
+  - Hired_Date (date, NULLABLE)
+  - Job_Id (int, NULLABLE)
+  - Salary (decimal, NULLABLE)
+  - Manager_id (int, NULLABLE)
+  - Department_id (int, NULLABLE)
+🔑 Primary Keys: None
+
+✅ Source and Target Table Structure and DataTypes are matched.</pre>
+        </div>
+        
+        <div class="detail-card pass">
+            <h4>Record Count Check</h4>
+            <pre>🔢 Record Count Check:
+ - Source (dbo.emp_merged): 83 rows
+ - Target (dbo.emp_merged_target): 83 rows
+✅ Source and Target Record counts are matched.</pre>
+        </div>
+        
+        <div class="detail-card pass">
+            <h4>Null Check (Source Table)</h4>
+            <pre>
+🚫 NULL Validation Report for: dbo.emp_merged
+ - Emp_id: 0 NULLs
+ - FirstName: 1 NULLs
+ - LastName: 0 NULLs
+ - Email: 1 NULLs
+ - PhoneNumber: 0 NULLs
+ - Hired_Date: 0 NULLs
+ - Job_Id: 0 NULLs
+ - Salary: 0 NULLs
+ - Manager_id: 9 NULLs
+ - Department_id: 0 NULLs
+✅ Nullable, Not Null and Primary Key Constraints are verified.</pre>
+        </div>
+        
+        <div class="detail-card pass">
+            <h4>Null Check (Target Table)</h4>
+            <pre>
+🚫 NULL Validation Report for: dbo.emp_merged_target
+ - Emp_id: 0 NULLs
+ - FirstName: 1 NULLs
+ - LastName: 0 NULLs
+ - Email: 1 NULLs
+ - PhoneNumber: 0 NULLs
+ - Hired_Date: 0 NULLs
+ - Job_Id: 0 NULLs
+ - Salary: 0 NULLs
+ - Manager_id: 9 NULLs
+ - Department_id: 0 NULLs
+✅ Nullable, Not Null and Primary Key Constraints are verified.</pre>
+        </div>
+        
+        <div class="detail-card info">
+            <h4>Duplicate Check (Source Table)</h4>
+            <pre>⚠️ No primary key found for table dbo.emp_merged. Cannot perform duplicate check.</pre>
+        </div>
+        
+        <div class="detail-card info">
+            <h4>Duplicate Check (Target Table)</h4>
+            <pre>⚠️ No primary key found for table dbo.emp_merged_target. Cannot perform duplicate check.</pre>
+        </div>
+        
+        <div class="detail-card pass">
+            <h4>Row-wise Data Validation</h4>
+            <pre>
+📊 Row-wise Data Validation (All Columns):
+✅ Matched Rows: 47
+❌ Rows present only in Source: 2
+❌ Rows present only in Target: 2
+
+🚨 Mismatched Records Details:
+🟠 Only in Source: {'Emp_id': 102, 'FirstName': 'Lex', 'LastName': 'De Haan', 'Email': 'lex.de haan@sqltutorial.org', 'PhoneNumber': '515.123.4569', 'Hired_Date': '1993-01-13', 'Job_Id': 5, 'Salary': 17000.0, 'Manager_id': 100, 'Department_id': 9}
+🟠 Only in Source: {'Emp_id': 112, 'FirstName': 'Jose Manuel', 'LastName': 'Urman', 'Email': 'jose manuel.urman@sqltutorial.org', 'PhoneNumber': '515.124.4469', 'Hired_Date': '1998-03-07', 'Job_Id': 6, 'Salary': 7800.0, 'Manager_id': 108, 'Department_id': 10}
+🔵 Only in Target: {'Emp_id': 102, 'FirstName': 'Lex', 'LastName': 'De haan', 'Email': 'lex.de haan@sqltutorial.org', 'PhoneNumber': '515.123.4569', 'Hired_Date': '1993-01-13', 'Job_Id': 5, 'Salary': 17000.0, 'Manager_id': 100, 'Department_id': 9}
+🔵 Only in Target: {'Emp_id': 112, 'FirstName': 'Jose manuel', 'LastName': 'Urman', 'Email': 'jose manuel.urman@sqltutorial.org', 'PhoneNumber': '515.124.4469', 'Hired_Date': '1998-03-07', 'Job_Id': 6, 'Salary': 7800.0, 'Manager_id': 108, 'Department_id': 10}
+
+📄 Mismatched details saved to: c:\Users\KavyaShriyan\ETL_DEMO_Pytest3\etl_project_two_tables\logs\row_data_mismatch_log.txt</pre>
+        </div>
+        
+        </div>
+    </div>
+    
+    <div class="footer">
+        ETL Validation Framework | Powered by PyTest & FastAPI
+    </div>
+    
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

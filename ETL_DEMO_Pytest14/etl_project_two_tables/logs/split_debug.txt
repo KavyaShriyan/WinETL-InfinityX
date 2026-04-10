@@ -1,0 +1,43 @@
+=== convert_results_for_reporting CALLED at 2026-04-08 23:24:00.856982 ===
+api_results keys: ['execution_id', 'source_table', 'target_table', 'timestamp', 'sample_size', 'validations', 'logs', 'status', 'performance_metrics', 'project_id', 'source_query', 'target_query']
+validations keys: ['structure_validation', 'count_validation', 'null_check', 'duplicate_check', 'row_data_validation']
+
+=== PROCESSING NULL_CHECK ===
+Full output length: 734
+Full output first 800 chars:
+
+🚫 NULL Validation Report for: Source (GlobalTBM.DimCountry)
+ - RecordMode: 244 NULLs
+ - Language: 0 NULLs
+ - CountryKey 🔒 NOT NULL: 0 NULLs
+ - CountryName: 0 NULLs
+ - Nationality: 9 NULLs
+ - CountryNameText: 0 NULLs
+ - NationalityText: 15 NULLs
+ - SuperRegionPerCountryText: 244 NULLs
+ - FileName: 0 NULLs
+ - FileRowID: 0 NULLs
+ - ActiveStatus: 0 NULLs
+ - StartDate: 0 NULLs
+ - EndDate: 0 NULLs
+ - BatchID: 0 NULLs
+ - LoadDateTime: 0 NULLs
+ - DatePart: 0 NULLs
+✅ Nullable, Not Null and Primary Key Constraints are verified.
+================================================================================
+ℹ️ Null Check skipped for 'Target (information_technology_qa.tbma.dimcountry)': No NOT NULL constraints or Primary Keys defined.
+
+
+Separator FOUND! Split into 2 parts
+Source output length: 523
+Target output length: 128
+
+--- TARGET OUTPUT (first 600 chars) ---
+ℹ️ Null Check skipped for 'Target (information_technology_qa.tbma.dimcountry)': No NOT NULL constraints or Primary Keys defined.
+
+
+=== FINAL STORED VALUES ===
+Source passed: True, output length: 523
+Target passed: True, output length: 128
+Target output stored (first 500):
+ℹ️ Null Check skipped for 'Target (information_technology_qa.tbma.dimcountry)': No NOT NULL constraints or Primary Keys defined.

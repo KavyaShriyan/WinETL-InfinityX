@@ -1,0 +1,75 @@
+{
+  "default": {
+    "type": "sqlserver",
+    "driver": "ODBC Driver 17 for SQL Server",
+    "server": "DESKTOP-KAVYASH\\SQLEXPRESS",
+    "database": "ETL Testing",
+    "trusted_connection": "yes"
+  },
+  "mysql_example": {
+    "type": "mysql",
+    "host": "localhost",
+    "username": "user",
+    "password": "pass",
+    "database": "test"
+  },
+  "postgres_example": {
+    "type": "postgresql",
+    "host": "localhost",
+    "username": "user",
+    "password": "pass",
+    "database": "test"
+  },
+  "mongodb_example": {
+    "type": "mongodb",
+    "uri": "mongodb://localhost:27017/",
+    "database": "test"
+  },
+  "s3_example": {
+    "type": "s3",
+    "access_key": "key",
+    "secret_key": "secret"
+  },
+  "api_example": {
+    "type": "api"
+  },
+  "powerbi_example": {
+    "type": "powerbi",
+    "client_id": "your_client_id_here",
+    "client_secret": "your_client_secret_here",
+    "tenant_id": "your_tenant_id_here"
+  },
+  "oracle_example": {
+    "type": "oracle",
+    "host": "localhost",
+    "port": 1521,
+    "username": "user",
+    "password": "pass",
+    "service_name": "orcl"
+  },
+  "databricks_example": {
+    "type": "databricks",
+    "server_hostname": "<workspace-url>",
+    "http_path": "<http-path>",
+    "access_token": "<personal-access-token>"
+  },
+  "azuresynapse_example": {
+    "type": "azuresynapse",
+    "driver": "ODBC Driver 17 for SQL Server",
+    "server": "<workspace-name>.sql.azuresynapse.net",
+    "database": "<database-name>",
+    "username": "<username>",
+    "password": "<password>",
+    "encrypt": true,
+    "trust_server_certificate": false
+  },
+  "fabric_example": {
+    "type": "fabric",
+    "driver": "ODBC Driver 17 for SQL Server",
+    "server": "<workspace-name>.datawarehouse.fabric.microsoft.com",
+    "database": "<database-name>",
+    "authentication": "ActiveDirectoryInteractive",
+    "encrypt": true,
+    "trust_server_certificate": true
+  }
+}

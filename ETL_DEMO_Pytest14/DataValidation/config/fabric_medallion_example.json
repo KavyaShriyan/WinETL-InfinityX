@@ -1,0 +1,214 @@
+{
+  "description": "Microsoft Fabric Medallion Architecture Configuration Examples",
+  "workspace_info": {
+    "workspace_name": "MyFabricWorkspace",
+    "sql_endpoint": "MyFabricWorkspace.datawarehouse.fabric.microsoft.com"
+  },
+  
+  "bronze_layer": {
+    "type": "fabric",
+    "driver": "ODBC Driver 17 for SQL Server",
+    "server": "MyFabricWorkspace.datawarehouse.fabric.microsoft.com",
+    "database": "Lakehouse_Bronze",
+    "authentication": "ActiveDirectoryInteractive",
+    "encrypt": true,
+    "trust_server_certificate": true,
+    "description": "Raw ingested data - minimal transformations",
+    "example_tables": [
+      "bronze.raw_sales",
+      "bronze.raw_customers",
+      "bronze.raw_products",
+      "bronze.raw_transactions"
+    ]
+  },
+  
+  "silver_layer": {
+    "type": "fabric",
+    "driver": "ODBC Driver 17 for SQL Server",
+    "server": "MyFabricWorkspace.datawarehouse.fabric.microsoft.com",
+    "database": "Lakehouse_Silver",
+    "authentication": "ActiveDirectoryInteractive",
+    "encrypt": true,
+    "trust_server_certificate": true,
+    "description": "Cleansed and standardized data - business rules applied",
+    "example_tables": [
+      "silver.sales_cleaned",
+      "silver.customers_validated",
+      "silver.products_standardized",
+      "silver.transactions_enriched"
+    ]
+  },
+  
+  "gold_layer": {
+    "type": "fabric",
+    "driver": "ODBC Driver 17 for SQL Server",
+    "server": "MyFabricWorkspace.datawarehouse.fabric.microsoft.com",
+    "database": "Lakehouse_Gold",
+    "authentication": "ActiveDirectoryInteractive",
+    "encrypt": true,
+    "trust_server_certificate": true,
+    "description": "Business-ready aggregated data - optimized for reporting",
+    "example_tables": [
+      "gold.dim_customer",
+      "gold.dim_product",
+      "gold.fact_sales",
+      "gold.sales_summary_monthly",
+      "gold.customer_360_view"
+    ]
+  },
+  
+  "validation_scenarios": {
+    "bronze_to_silver": {
+      "name": "Bronze to Silver Data Quality Validation",
+      "source": {
+        "layer": "bronze",
+        "table": "bronze.raw_sales"
+      },
+      "target": {
+        "layer": "silver",
+        "table": "silver.sales_cleaned"
+      },
+      "validations": [
+        "row_count_match",
+        "no_duplicates_in_target",
+        "null_checks_on_required_fields",
+        "data_type_consistency",
+        "referential_integrity"
+      ],
+      "expected_behavior": "Target may have fewer rows due to filtering invalid records"
+    },
+    
+    "silver_to_gold_aggregation": {
+      "name": "Silver to Gold Aggregation Validation",
+      "source": {
+        "layer": "silver",
+        "table": "silver.transactions_enriched",
+        "query": "SELECT product_id, SUM(amount) as total FROM silver.transactions_enriched GROUP BY product_id"
+      },
+      "target": {
+        "layer": "gold",
+        "table": "gold.product_sales_summary",
+        "query": "SELECT product_id, total_sales FROM gold.product_sales_summary"
+      },
+      "validations": [
+        "aggregation_accuracy",
+        "no_missing_products",
+        "calculation_correctness"
+      ]
+    },
+    
+    "cross_workspace_validation": {
+      "name": "Development to Production Validation",
+      "source": {
+        "server": "dev-workspace.datawarehouse.fabric.microsoft.com",
+        "database": "DevLakehouse",
+        "table": "gold.fact_sales"
+      },
+      "target": {
+        "server": "prod-workspace.datawarehouse.fabric.microsoft.com",
+        "database": "ProdLakehouse",
+        "table": "gold.fact_sales"
+      },
+      "validations": [
+        "schema_match",
+        "data_consistency",
+        "partition_validation"
+      ]
+    }
+  },
+  
+  "alternative_auth_methods": {
+    "sql_auth": {
+      "type": "fabric",
+      "server": "MyFabricWorkspace.datawarehouse.fabric.microsoft.com",
+      "database": "Lakehouse_Bronze",
+      "username": "fabricadmin@contoso.com",
+      "password": "<password>",
+      "encrypt": true,
+      "trust_server_certificate": true
+    },
+    
+    "service_principal": {
+      "type": "fabric",
+      "server": "MyFabricWorkspace.datawarehouse.fabric.microsoft.com",
+      "database": "Lakehouse_Bronze",
+      "authentication": "ActiveDirectoryServicePrincipal",
+      "client_id": "<app-id>",
+      "client_secret": "<app-secret>",
+      "encrypt": true,
+      "trust_server_certificate": true
+    },
+    
+    "aad_password": {
+      "type": "fabric",
+      "server": "MyFabricWorkspace.datawarehouse.fabric.microsoft.com",
+      "database": "Lakehouse_Bronze",
+      "authentication": "ActiveDirectoryPassword",
+      "username": "user@contoso.com",
+      "password": "<password>",
+      "encrypt": true,
+      "trust_server_certificate": true
+    }
+  },
+  
+  "schema_patterns": {
+    "pattern_1_schema_based": {
+      "description": "Using database schemas to separate layers",
+      "database": "SingleLakehouse",
+      "bronze_tables": ["bronze.table1", "bronze.table2"],
+      "silver_tables": ["silver.table1", "silver.table2"],
+      "gold_tables": ["gold.table1", "gold.table2"]
+    },
+    
+    "pattern_2_database_based": {
+      "description": "Using separate databases for each layer",
+      "bronze_database": "Lakehouse_Bronze",
+      "silver_database": "Lakehouse_Silver",
+      "gold_database": "Lakehouse_Gold",
+      "tables": ["customers", "products", "sales"]
+    },
+    
+    "pattern_3_prefix_based": {
+      "description": "Using table name prefixes",
+      "database": "MainLakehouse",
+      "tables": [
+        "bronze_customers",
+        "silver_customers",
+        "gold_dim_customer"
+      ]
+    }
+  },
+  
+  "common_validation_queries": {
+    "row_count_comparison": {
+      "bronze": "SELECT COUNT(*) FROM bronze.raw_sales WHERE load_date = '2026-02-06'",
+      "silver": "SELECT COUNT(*) FROM silver.sales_cleaned WHERE process_date = '2026-02-06'"
+    },
+    
+    "data_quality_check": {
+      "silver": "SELECT COUNT(*) FROM silver.customers_validated WHERE email IS NULL OR email NOT LIKE '%@%'"
+    },
+    
+    "aggregation_validation": {
+      "silver_source": "SELECT region_id, SUM(sales_amount) as total FROM silver.sales_cleaned GROUP BY region_id",
+      "gold_target": "SELECT region_id, total_sales FROM gold.regional_sales_summary"
+    },
+    
+    "delta_time_travel": {
+      "description": "Query historical version for comparison",
+      "current": "SELECT * FROM gold.fact_sales",
+      "historical": "SELECT * FROM gold.fact_sales TIMESTAMP AS OF '2026-02-01'"
+    }
+  },
+  
+  "best_practices": [
+    "Use incremental validation for large tables with date/partition filters",
+    "Validate Bronze→Silver for data quality and completeness",
+    "Validate Silver→Gold for aggregation accuracy",
+    "Document expected row count differences (e.g., filtering in Silver)",
+    "Use time travel for regression testing after updates",
+    "Schedule validations after each layer refresh",
+    "Alert on validation failures",
+    "Track data quality metrics over time"
+  ]
+}

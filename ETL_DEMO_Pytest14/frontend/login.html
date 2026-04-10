@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in - WinETL InfinityX</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 70px 20px 40px;
+            min-height: 100vh;
+        }
+
+        /* Background pattern overlay - subtle */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(45deg, #f5f5f5 25%, transparent 25%),
+                linear-gradient(-45deg, #f5f5f5 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #f5f5f5 75%),
+                linear-gradient(-45deg, transparent 75%, #f5f5f5 75%);
+            background-size: 40px 40px;
+            background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        /* Header Logo */
+        .header-logo {
+            position: absolute;
+            top: 20px;
+            left: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .etl-logo-svg {
+            width: 45px;
+            height: 45px;
+            filter: drop-shadow(0 2px 6px rgba(59, 130, 246, 0.3));
+        }
+
+        .header-logo-text h1 {
+            font-size: 1.4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #2563eb 0%, #FF9933 50%, #0ea5e9 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .header-logo-text p {
+            font-size: 0.65rem;
+            color: #475569;
+            font-weight: 600;
+            margin: 0;
+            margin-top: -2px;
+        }
+
+        /* Login Card Container */
+        .login-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 520px;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Main Login Card */
+        .login-card {
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+            padding: 40px 48px 36px;
+            width: 100%;
+        }
+
+        /* Logo in card */
+        .card-logo {
+            text-align: left;
+            margin-bottom: 28px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 14px;
+            justify-content: center;
+        }
+
+        .card-etl-logo-svg {
+            width: 55px;
+            height: 55px;
+            filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.3));
+            flex-shrink: 0;
+        }
+
+        .card-logo-text h1 {
+            font-size: 1.7rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #2563eb 0%, #FF9933 50%, #0ea5e9 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .card-logo-text p {
+            font-size: 0.7rem;
+            color: #475569;
+            font-weight: 600;
+            margin: 0;
+            margin-top: 2px;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 10px 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .alert-error {
+            background: #fde7e9;
+            color: #c42b1c;
+            border-left: 3px solid #c42b1c;
+        }
+
+        .alert-success {
+            background: #dff6dd;
+            color: #107c10;
+            border-left: 3px solid #107c10;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.93em;
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8a8886;
+            font-size: 1em;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 11px 12px 11px 38px;
+            border: 1px solid #8a8886;
+            border-radius: 2px;
+            font-size: 0.95em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.1s;
+            background: white;
+        }
+
+        .form-control:hover {
+            border-color: #323130;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #0078d4;
+            border-width: 2px;
+            padding: 10px 11px 10px 37px;
+        }
+
+        /* Options Row */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #0078d4;
+        }
+
+        .remember-me label {
+            color: #323130;
+            cursor: pointer;
+            user-select: none;
+            font-weight: 400;
+        }
+
+        .forgot-link {
+            color: #0078d4;
+            text-decoration: none;
+            font-weight: 400;
+        }
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            padding: 10px;
+            background: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 2px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .btn-submit:hover {
+            background: #106ebe;
+        }
+
+        .btn-submit:active {
+            background: #005a9e;
+        }
+
+        .btn-submit:disabled {
+            background: #f3f2f1;
+            color: #a19f9d;
+            cursor: not-allowed;
+        }
+
+        .loading-spinner {
+            display: none;
+        }
+
+        .loading-spinner.active {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .fa-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Divider */
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+            font-size: 0.85em;
+            color: #8a8886;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: #edebe9;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 16px;
+            position: relative;
+        }
+
+        /* Signup Link */
+        .signup-row {
+            text-align: center;
+            font-size: 0.9em;
+            color: #323130;
+        }
+
+        .signup-row a {
+            color: #0078d4;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .signup-row a:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer Info */
+        .footer-info {
+            text-align: center;
+            margin-top: 22px;
+            padding: 0 20px;
+        }
+
+        .info-cards {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: nowrap;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 6px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.8em;
+            color: #1f1f1f;
+            font-weight: 500;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+            white-space: nowrap;
+        }
+
+        .info-card i {
+            color: #0078d4;
+            font-size: 1.15em;
+        }
+
+        /* Footer text */
+        .footer-text {
+            margin-top: 16px;
+            font-size: 0.8em;
+            color: #605e5c;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-logo {
+                top: 12px;
+                left: 12px;
+                gap: 8px;
+            }
+
+            .etl-logo-svg {
+                width: 35px;
+                height: 35px;
+            }
+
+            .header-logo-text h1 {
+                font-size: 1rem;
+            }
+
+            .header-logo-text p {
+                font-size: 0.5rem;
+            }
+
+            .login-wrapper {
+                max-width: 100%;
+                padding: 16px;
+            }
+
+            .login-card {
+                padding: 28px 24px 24px;
+            }
+
+            .card-logo {
+                gap: 10px;
+            }
+
+            .card-etl-logo-svg {
+                width: 42px;
+                height: 42px;
+            }
+
+            .card-logo-text h1 {
+                font-size: 1.3rem;
+            }
+
+            .card-logo-text p {
+                font-size: 0.6rem;
+            }
+
+            .footer-info {
+                padding: 0 12px;
+            }
+
+            .info-cards {
+                gap: 8px;
+            }
+
+            .info-card {
+                padding: 8px 10px;
+                font-size: 0.75em;
+                gap: 6px;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .login-card {
+                padding: 24px 32px;
+            }
+
+            .card-logo {
+                margin-bottom: 18px;
+            }
+
+            .card-etl-logo-svg {
+                width: 48px;
+                height: 48px;
+            }
+
+            .card-logo-text h1 {
+                font-size: 1.5rem;
+            }
+
+            .card-logo-text p {
+                font-size: 0.65rem;
+            }
+
+            .footer-info {
+                margin-top: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo in top left -->
+    <div class="header-logo">
+        <!-- ETL Logo SVG -->
+        <svg class="etl-logo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <!-- Extract Circle -->
+            <circle cx="40" cy="100" r="25" fill="#3b82f6" opacity="0.9"/>
+            <text x="40" y="108" font-size="20" font-weight="bold" fill="white" text-anchor="middle">E</text>
+            
+            <!-- Transform Circle -->
+            <circle cx="100" cy="100" r="25" fill="#FF8C42" opacity="0.9"/>
+            <text x="100" y="108" font-size="20" font-weight="bold" fill="white" text-anchor="middle">T</text>
+            
+            <!-- Load Circle -->
+            <circle cx="160" cy="100" r="25" fill="#22c55e" opacity="0.9"/>
+            <text x="160" y="108" font-size="20" font-weight="bold" fill="white" text-anchor="middle">L</text>
+            
+            <!-- Arrows -->
+            <path d="M 65 100 L 75 100" stroke="white" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+            <path d="M 125 100 L 135 100" stroke="white" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+            
+            <!-- Arrow marker definition -->
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                    <polygon points="0 0, 10 3, 0 6" fill="white" />
+                </marker>
+            </defs>
+        </svg>
+        
+        <div class="header-logo-text">
+            <h1>WinETL InfinityX</h1>
+            <p>Enterprise ETL Validation & Data Reconciliation Engine</p>
+        </div>
+    </div>
+
+    <!-- Login Card Container -->
+    <div class="login-wrapper">
+        <!-- Main Login Card -->
+        <div class="login-card">
+            <!-- Logo in Card -->
+            <div class="card-logo">
+                <!-- ETL Logo SVG -->
+                <svg class="card-etl-logo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Extract Circle -->
+                    <circle cx="40" cy="100" r="25" fill="#3b82f6" opacity="0.9"/>
+                    <text x="40" y="108" font-size="20" font-weight="bold" fill="white" text-anchor="middle">E</text>
+                    
+                    <!-- Transform Circle -->
+                    <circle cx="100" cy="100" r="25" fill="#FF8C42" opacity="0.9"/>
+                    <text x="100" y="108" font-size="20" font-weight="bold" fill="white" text-anchor="middle">T</text>
+                    
+                    <!-- Load Circle -->
+                    <circle cx="160" cy="100" r="25" fill="#22c55e" opacity="0.9"/>
+                    <text x="160" y="108" font-size="20" font-weight="bold" fill="white" text-anchor="middle">L</text>
+                    
+                    <!-- Arrows -->
+                    <path d="M 65 100 L 75 100" stroke="white" stroke-width="3" fill="none" marker-end="url(#arrowhead-card)"/>
+                    <path d="M 125 100 L 135 100" stroke="white" stroke-width="3" fill="none" marker-end="url(#arrowhead-card)"/>
+                    
+                    <!-- Arrow marker definition -->
+                    <defs>
+                        <marker id="arrowhead-card" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="white" />
+                        </marker>
+                    </defs>
+                </svg>
+                
+                <div class="card-logo-text">
+                    <h1>WinETL InfinityX</h1>
+                    <p>Enterprise ETL Validation & Data Reconciliation Engine</p>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <div class="alert alert-error" id="errorAlert"></div>
+            <div class="alert alert-success" id="successAlert"></div>
+
+            <!-- Login Form -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="emailOrUserid">Email or User ID</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" 
+                               id="emailOrUserid" 
+                               class="form-control" 
+                               placeholder="someone@example.com"
+                               required
+                               autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" 
+                               id="password" 
+                               class="form-control" 
+                               placeholder="Enter your password"
+                               required
+                               autocomplete="current-password">
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <div class="remember-me">
+                        <input type="checkbox" id="rememberMe">
+                        <label for="rememberMe">Keep me signed in</label>
+                    </div>
+                    <a href="#" class="forgot-link" onclick="alert('Please contact your administrator to reset your password'); return false;">
+                        Forgot password?
+                    </a>
+                </div>
+
+                <button type="submit" class="btn-submit" id="loginBtn">
+                    Sign in
+                    <i class="fas fa-spinner loading-spinner" id="loginSpinner"></i>
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>New to WinETL?</span>
+            </div>
+
+            <div class="signup-row">
+                <a href="signup.html">Create an account</a>
+            </div>
+        </div>
+
+        <!-- Footer Information -->
+        <div class="footer-info">
+            <div class="info-cards">
+                <div class="info-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure Authentication</span>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-cloud"></i>
+                    <span>Azure Ready</span>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-lock"></i>
+                    <span>RBAC Enabled</span>
+                </div>
+            </div>
+            <div class="footer-text">
+                &copy; 2026 WinWire Technologies | Version 8.0
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        // Load saved credentials on page load
+        window.addEventListener('load', () => {
+            const savedEmail = localStorage.getItem('rememberedEmail');
+            const savedPassword = localStorage.getItem('rememberedPassword');
+            
+            if (savedEmail && savedPassword) {
+                document.getElementById('emailOrUserid').value = savedEmail;
+                document.getElementById('password').value = savedPassword;
+                document.getElementById('rememberMe').checked = true;
+            }
+        });
+
+        // Handle Remember Me checkbox change
+        document.getElementById('rememberMe').addEventListener('change', (e) => {
+            if (!e.target.checked) {
+                localStorage.removeItem('rememberedEmail');
+                localStorage.removeItem('rememberedPassword');
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const emailOrUserid = document.getElementById('emailOrUserid').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const spinner = document.getElementById('loginSpinner');
+            const errorAlert = document.getElementById('errorAlert');
+            const successAlert = document.getElementById('successAlert');
+
+            // Hide previous alerts
+            errorAlert.style.display = 'none';
+            successAlert.style.display = 'none';
+
+            // Validate inputs
+            if (!emailOrUserid || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            // Disable button and show spinner
+            loginBtn.disabled = true;
+            spinner.classList.add('active');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email_or_userid: emailOrUserid,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store session token and user data
+                    localStorage.setItem('sessionToken', data.user.session_token);
+                    localStorage.setItem('userData', JSON.stringify(data.user));
+
+                    // Save credentials if Remember Me is checked
+                    const rememberMe = document.getElementById('rememberMe').checked;
+                    if (rememberMe) {
+                        localStorage.setItem('rememberedEmail', emailOrUserid);
+                        localStorage.setItem('rememberedPassword', password);
+                    } else {
+                        localStorage.removeItem('rememberedEmail');
+                        localStorage.removeItem('rememberedPassword');
+                    }
+
+                    showSuccess('Login successful! Redirecting...');
+
+                    // Redirect to main dashboard after 1 second
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    showError(data.message || 'Login failed');
+                    loginBtn.disabled = false;
+                    spinner.classList.remove('active');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Connection error. Please try again.');
+                loginBtn.disabled = false;
+                spinner.classList.remove('active');
+            }
+        });
+
+        function showError(message) {
+            const errorAlert = document.getElementById('errorAlert');
+            errorAlert.textContent = message;
+            errorAlert.style.display = 'block';
+        }
+
+        function showSuccess(message) {
+            const successAlert = document.getElementById('successAlert');
+            successAlert.textContent = message;
+            successAlert.style.display = 'block';
+        }
+
+        // Check if already logged in
+        window.addEventListener('load', () => {
+            const sessionToken = localStorage.getItem('sessionToken');
+            if (sessionToken) {
+                // Validate session
+                fetch(`${API_BASE}/api/auth/validate`, {
+                    headers: {
+                        'Authorization': `Bearer ${sessionToken}`
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Already logged in, redirect
+                        window.location.href = '/';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
